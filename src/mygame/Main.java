@@ -5,16 +5,24 @@ import terrainDecorator.GrassTerrain;
 import terrainDecorator.ITerrain;
 import terrainDecorator.BasicTerrain;
 import com.jme3.app.SimpleApplication;
+import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
+import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.WaterFilter;
 
 
@@ -28,9 +36,39 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         initTerrain();
-        initPPcWater(); 
+        initPPcWater();
         
         flyCam.setMoveSpeed(50);
+        initLight(10f, 10f, 10f);
+        initAnimation(10f, 10f, 10f);
+        initLight(100f, 10f, 100f);
+        initAnimation(100f, 10f, 100f);
+        initLight(500f, 10f, 500f);
+        initAnimation(500f, 10f, 500f);
+        initLight(-200f, 10f, -200f);
+        initAnimation(-200f, 10f, -200f);
+        initLight(-200f, 10f, -200f);
+        initAnimation(-200f, 10f, -200f);
+        initLight(10f, 10f, 500f);
+        initWall(10f, 10f, 200f);
+        initLight(200f, 10f, 200f);
+        initWall(200f, 10f, 200f);
+        initLight(500f, 10f, 400f);
+        initWall(500f, 10f, 400f);
+        initLight(-200f, 10f, -200f);
+        initWall(-200f, 10f, -200f);
+        initLight(-500f, 10f, -400f);
+        initWall(-500f, 10f, -400f);
+        initLight(-500f, 10f, -200f);
+        initSphere(-500f, 10f, -200f);
+        initLight(0f, 0f, 0f);
+        initSphere(50f, 50f, 50f);
+        initLight(-300f, 10f, -200f);
+        initSphere(-300f, 10f, -200f);
+        initLight(-150f, 10f, -150f);
+        initSphere(-150f, 10f, -150f);
+        initLight(300f, 10f, 200f);
+        initSphere(300f, 10f, 200f);
     }
 
     @Override
@@ -82,6 +120,54 @@ public class Main extends SimpleApplication {
         fpp.addFilter(water);
         viewPort.addProcessor(fpp);
          
-    }   
+    } 
+     
+    public void initAnimation(float x, float y, float z) {
+      Node player = (Node) assetManager.loadModel("Models/Oto/Oto.mesh.xml");
+      player.setLocalScale(3f);
+      player.setLocalTranslation(x,y,z);
+      rootNode.attachChild(player);
+    }
+    
+    public void initLight(float x, float y, float z) {
+        DirectionalLight sun = new DirectionalLight();
+        sun.setDirection(new Vector3f(x,y,z));
+        rootNode.addLight(sun);
+    }
+    
+    public void initWall(float x, float y, float z) {
+    Box box = new Box(20f, 20f, 20f);
+    Spatial wall = new Geometry("Box", box);
+    //box.setTextureMode(Box.TextureMode.Projected); // better quality on spheres
+    TangentBinormalGenerator.generate(box);           // for lighting effect
+    Material boxMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    boxMat.setTexture("ColorMap", assetManager.loadTexture("Textures/Terrain/BrickWall/BrickWall.jpg"));
+    wall.setMaterial(boxMat);
+    wall.setLocalTranslation(x, y, z); // Move it a bit
+    //boxGeo.rotate(1.6f, 0, 0);          // Rotate it a bit
+    rootNode.attachChild(wall);
+    }
+    
+    public void initSphere(float x, float y, float z) {
+        Sphere sphereMesh = new Sphere(32,32, 20f);
+        Geometry sphereGeo = new Geometry("Shiny rock", sphereMesh);
+        sphereMesh.setTextureMode(Sphere.TextureMode.Projected); // better quality on spheres
+        TangentBinormalGenerator.generate(sphereMesh);           // for lighting effect
+        Material sphereMat = new Material(assetManager, 
+        "Common/MatDefs/Light/Lighting.j3md");
+        sphereMat.setTexture("DiffuseMap", 
+        assetManager.loadTexture("Textures/Terrain/Rocky/RockyNormals.jpg"));
+        sphereMat.setTexture("NormalMap", 
+        assetManager.loadTexture("Textures/Terrain/Pond/Pond.jpg"));
+        sphereMat.setBoolean("UseMaterialColors",true);    
+        sphereMat.setColor("Diffuse",ColorRGBA.Red);
+        sphereMat.setColor("Specular",ColorRGBA.Yellow);
+        sphereMat.setFloat("Shininess", 64f);  // [0,128]
+        sphereGeo.setMaterial(sphereMat);
+        sphereGeo.setLocalTranslation(x,y,z); // Move it a bit
+        sphereGeo.rotate(1.6f, 0, 0);          // Rotate it a bit
+        rootNode.attachChild(sphereGeo);
+    }
+    
     
 }
