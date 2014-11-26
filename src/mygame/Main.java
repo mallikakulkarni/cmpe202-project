@@ -1,5 +1,9 @@
 package mygame;
 
+import StrategyColor.ConcreteRed;
+import StrategyColor.ConcreteBlue;
+import StrategyColor.ConcretePink;
+import StrategyColor.StrategyColorInterface;
 import terrainDecorator.RoadTerrain;
 import terrainDecorator.GrassTerrain;
 import terrainDecorator.ITerrain;
@@ -28,6 +32,7 @@ import com.jme3.water.WaterFilter;
 
 public class Main extends SimpleApplication {
   
+    StrategyColorInterface strategy;
     public static void main(String[] args) {
         Main app = new Main();
         app.start();
@@ -69,6 +74,27 @@ public class Main extends SimpleApplication {
         initSphere(-150f, 10f, -150f);
         initLight(300f, 10f, 200f);
         initSphere(300f, 10f, 200f);
+
+	strategy=new ConcreteBlue();
+        initGumballs(-150.0f , 3.0f , 60.0f);
+        strategy=new ConcreteRed();
+        initGumballs(-50.0f , 3.0f , 40.0f);
+        strategy=new ConcreteBlue();
+        initGumballs(50.0f , 3.0f , 60.0f);
+        strategy=new ConcreteRed();
+        initGumballs(10.0f , 3.0f , 80.0f);
+        strategy=new ConcretePink();
+        initGumballs(30f , 3.0f , 40.0f);
+        strategy=new ConcreteRed();
+        initGumballs(200.0f , 3.0f , 100.0f);
+        strategy=new ConcretePink();
+        initGumballs(-50.0f , 3.0f , 100.0f);
+        strategy=new ConcreteRed();
+        initGumballs(100.0f , 3.0f , 30.0f);
+         strategy=new ConcretePink();
+        initGumballs(-450.0f , 3.0f , 160.0f);
+        strategy=new ConcreteRed();
+        initGumballs(450.0f , 3.0f , -40.0f);
     }
 
     @Override
@@ -168,6 +194,22 @@ public class Main extends SimpleApplication {
         sphereGeo.rotate(1.6f, 0, 0);          // Rotate it a bit
         rootNode.attachChild(sphereGeo);
     }
+
+public void initGumballs(float x, float y, float z)
+     {
+           
+        Vector3f v = new Vector3f(x,y,z);
+        Sphere s = new Sphere(30, 30, 1, false, true);
+        Geometry geoms = new Geometry("Sphere", s);
+        Material mats1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mats1.setColor("Color", strategy.getColor());
+        geoms.setMaterial(mats1);
+        geoms.setLocalTranslation(v);
+        rootNode.attachChild(geoms);
+
+         
+     }
+
     
     
 }
