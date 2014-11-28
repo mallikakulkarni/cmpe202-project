@@ -7,6 +7,7 @@ package observer;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
+import mygame.AppStates.GamePlayAppState;
 import mygame.GameStarter;
 
 /**
@@ -17,7 +18,7 @@ public class CarControlActionListener implements ActionListener {
 
     public void onAction(String binding,  boolean value, float tpf) {
         
-        GameStarter instance = GameStarter.getInstance();
+        GamePlayAppState instance = GamePlayAppState.getInstance();
         
         if (binding.equals("Lefts")) {
             if (value) {
