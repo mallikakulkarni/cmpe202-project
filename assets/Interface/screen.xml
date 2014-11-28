@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty-1.3.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty-1.3.xsd http://nifty-gui.sourceforge.net/nifty-1.3.xsd">
+<useStyles filename="nifty-default-styles.xml" />
+<useControls filename="nifty-default-controls.xml" />  
+
+  <screen id="start" controller="mygame.AppStates.StartScreenAppState">
+    <layer id="background" childLayout="center">
+        <image filename="Interface/ferrari.jpg"/>
+    </layer>          
+    <layer id="foreground" childLayout="horizontal">
+      <panel id="panel_left" height="25%" width="75%" align="center" childLayout="vertical"> 
+          <text text="Gumball Game" font="Interface/Fonts/Arial.fnt" color = "#000f" width="100%" height="100%"/> 
+      </panel>
+      <panel id="panel_right" height="100%" width="25%" childLayout="vertical">  
+        <panel id="panel_right_up" height="25%" width="75%" childLayout="center">  
+            <control name="button" label="Start/Resume" id="StartButton" align="center" valign="center" visibleToMouse="true">
+                <interact onClick="startGame()"/>
+            </control>
+        </panel>
+        <panel id="panel_right_down" height="25%" width="75%" childLayout="center">  
+            <control name="button" label="Quit" id="QuitButton" align="center" valign="center" visibleToMouse="true">
+                <interact onClick="quitGame()"/> 
+            </control>
+        </panel>
+      </panel>
+    </layer>
+  </screen>
+</nifty>
