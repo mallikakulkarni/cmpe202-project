@@ -20,6 +20,8 @@ import com.jme3.input.InputManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.TextRenderer;
 
 
 /**
@@ -64,6 +66,7 @@ public class StartScreenAppState extends AbstractAppState implements ScreenContr
         nifty = niftyDisplay.getNifty();
         nifty.fromXml("Interface/screen.xml", "start", this);
         nifty.addXml("Interface/screen2.xml");
+        nifty.addXml("Interface/gameover.xml");
         
         //attach the nifty display to the gui view port as a processor
         guiViewPort.addProcessor(niftyDisplay);
@@ -105,6 +108,16 @@ public class StartScreenAppState extends AbstractAppState implements ScreenContr
         instance.setEnabled(false);
         nifty.gotoScreen("start");
         setEnabled(true);
+    }
+    
+    public void updateScore(int num) {
+        Screen screen = nifty.getScreen("hud");
+        Element score = screen.findElementByName("score");
+        TextRenderer textRenderer = score.getRenderer(TextRenderer.class);
+        textRenderer.setText("      Score: "+num+"/5");
+        if (num == 5) {
+            nifty.gotoScreen("endgame");
+        }
     }
         
     @Override

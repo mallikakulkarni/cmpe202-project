@@ -12,7 +12,8 @@
       </panel>
       <panel id="panel_right" width="15%" height="100%" childLayout="vertical">  
         <panel id="panel_top_right1" width="100%" height="15%" childLayout="center">  
-            <control name="label" color="#000" text="123" width="100%" height="100%" />
+            <text id="score" font="Interface/Fonts/Arial.fnt" color="#000000" text="0/0" align="left" textSize="20" valign="center" />
+            <!-- control name="label" id = "score" color="#000" text="" width="100%" height="100%" /-->
         </panel>
         <panel id="panel_top_right2" width="100%" height="10%" childLayout="center">  
             <control name="button" label="Pause" id="PauseButton" align="center" valign="center"> 
