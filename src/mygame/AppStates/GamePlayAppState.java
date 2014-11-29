@@ -9,16 +9,11 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioRenderer;
 import com.jme3.font.BitmapFont;
 import com.jme3.input.InputManager;
-import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
-import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.screen.Screen;
-import de.lessvoid.nifty.screen.ScreenController;
 import StrategyColor.ConcreteRed;
 import StrategyColor.ConcreteBlue;
 import StrategyColor.ConcretePink;
@@ -27,9 +22,9 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.control.VehicleControl;
+import com.jme3.font.BitmapText;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
-import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import terrainDecorator.RoadTerrain;
 import terrainDecorator.GrassTerrain;
@@ -40,13 +35,11 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
-import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
@@ -82,8 +75,8 @@ public class GamePlayAppState extends AbstractAppState {
     Vector3f jumpForce = new Vector3f(0, 3000, 0);
     // kandarp
     StrategyColorInterface strategy;
-   
-    //private static GamePlayAppState instance;
+    private StartScreenAppState startScreenAppState;
+    private static int gameScore;
 
     // kandarp
     private static GamePlayAppState instance = new GamePlayAppState();
@@ -94,6 +87,7 @@ public class GamePlayAppState extends AbstractAppState {
     public GamePlayAppState() {
         //instance = this;
     }
+
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -108,6 +102,8 @@ public class GamePlayAppState extends AbstractAppState {
         this.audioRenderer = this.app.getAudioRenderer();
         this.stateManager = stateManager;
         
+        startScreenAppState = stateManager.getState(StartScreenAppState.class);
+        
         //TODO: initialize your AppState, e.g. attach spatials to rootNode
         //this is called on the OpenGL thread after the AppState has been attached
 
@@ -121,6 +117,7 @@ public class GamePlayAppState extends AbstractAppState {
     public void update(float tpf) {
         //TODO: implement behavior during runtime
         cam.lookAt(vehicle.getPhysicsLocation(), Vector3f.UNIT_Y);
+        startScreenAppState.updateScore(gameScore);
     }
 
     @Override
@@ -132,6 +129,9 @@ public class GamePlayAppState extends AbstractAppState {
     }
    
     /*Custom methods*/
+    public void scoreApi() {
+        gameScore++;
+    }
     public void setUpGame(SimpleApplication app) {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
