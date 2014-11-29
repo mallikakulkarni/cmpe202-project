@@ -9,16 +9,16 @@ package obstacleFactory;
  * @author mallika
  */
 public class ObstacleFactory {
-    public Obstacle createObstacle(String type) {
-        Obstacle obstacle= null;
+    public Obstacle createObstacle(int i) {
+        Obstacle obstacle;
         
-       // if (type.equals("wall")) {
-         //   obstacle = new BrickWall();
-        //}
-        //else if (type.equals("ball")) {
-         //   obstacle = new TexturedObstacles();
-        //}
-        if (type.equals("human")) {
+        if ((i % 3) == 0) {
+            obstacle = new BrickWall();
+        }
+        else if ((i % 5) == 0) {
+            obstacle = new TexturedObstacles();
+        }
+        else {
             obstacle = new Animation();
         }
         return obstacle;

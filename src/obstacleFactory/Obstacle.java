@@ -15,7 +15,7 @@ import com.jme3.scene.Spatial;
  */
 public interface Obstacle {
 
-    public void runApplication();
+    public String typeOfObstacle();
     
     
 }

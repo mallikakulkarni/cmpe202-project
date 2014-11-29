@@ -55,6 +55,7 @@ import com.jme3.texture.Texture2D;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.WaterFilter;
 import observer.CarControlActionListener;
+
 /**
  *
  * @author Tanveer
@@ -81,6 +82,7 @@ public class GamePlayAppState extends AbstractAppState {
     Vector3f jumpForce = new Vector3f(0, 3000, 0);
     // kandarp
     StrategyColorInterface strategy;
+   
     //private static GamePlayAppState instance;
 
     // kandarp
@@ -142,91 +144,55 @@ public class GamePlayAppState extends AbstractAppState {
         buildPlayer();
         Vector3f v = vehicle.getPhysicsLocation();
 
-        strategy = new ConcreteBlue();
-
+        
         v.z += 10;
-        initGumballs(v);
-
+        initSphere(v);
+        
+        strategy = new ConcretePink();
         v.z += 20;
         v.x += 10;
         initGumballs(v);
 
-        strategy = new ConcretePink();
+        
         v.z += 10;
         v.x += -20;
-        initGumballs(v);
-
-
+        initAnimation(v);
+        
         strategy = new ConcreteRed();
         v.z += 10;
         v.x += -20;
         initGumballs(v);
 
+        v.z += 10;
+        v.x += -20;
         initWall(v);
-
-//        flyCam.setMoveSpeed(50);
-//        initLight(10f, 10f, 10f);
-//        initAnimation(10f, 10f, 10f);
-//        initLight(100f, 10f, 100f);
-//        initAnimation(100f, 10f, 100f);
-//        initLight(500f, 10f, 500f);
-//        initAnimation(500f, 10f, 500f);
-//        initLight(-200f, 10f, -200f);
-//        initAnimation(-200f, 10f, -200f);
-//        initLight(-200f, 10f, -200f);
-//        initAnimation(-200f, 10f, -200f);
-//        initLight(10f, 10f, 500f);
-//        initWall(10f, 10f, 200f);
-//        initLight(200f, 10f, 200f);
-//        initWall(200f, 10f, 200f);
-//        initLight(500f, 10f, 400f);
-//        initWall(500f, 10f, 400f);
-//        initLight(-200f, 10f, -200f);
-//        initWall(-200f, 10f, -200f);
-//        initLight(-500f, 10f, -400f);
-//        initWall(-500f, 10f, -400f);
-//        initLight(-500f, 10f, -200f);
-//        initSphere(-500f, 10f, -200f);
-//        initLight(0f, 0f, 0f);
-//        initSphere(50f, 50f, 50f);
-//        initLight(-300f, 10f, -200f);
-//        initSphere(-300f, 10f, -200f);
-//        initLight(-150f, 10f, -150f);
-//        initSphere(-150f, 10f, -150f);
-//        initLight(300f, 10f, 200f);
-//        initSphere(300f, 10f, 200f);
-//
-//	strategy=new ConcreteBlue();
-//        initGumballs(-150.0f , 3.0f , 60.0f);
-//        strategy=new ConcreteRed();
-//        initGumballs(-50.0f , 3.0f , 40.0f);
-//        strategy=new ConcreteBlue();
-//        initGumballs(50.0f , 3.0f , 60.0f);
-//        strategy=new ConcreteRed();
-//        initGumballs(10.0f , 3.0f , 80.0f);
-//        strategy=new ConcretePink();
-//        initGumballs(30f , 3.0f , 40.0f);
-//        strategy=new ConcreteRed();
-//        initGumballs(200.0f , 3.0f , 100.0f);
-//        strategy=new ConcretePink();
-//        initGumballs(-50.0f , 3.0f , 100.0f);
-//        strategy=new ConcreteRed();
-//        initGumballs(100.0f , 3.0f , 30.0f);
-//         strategy=new ConcretePink();
-//        initGumballs(-450.0f , 3.0f , 160.0f);
-//        strategy=new ConcreteRed();
-//        initGumballs(450.0f , 3.0f , -40.0f);
-
+        
+        strategy = new ConcreteRed();
+        v.z += 10;
+        v.x += -20;
+        initGumballs(v);
+        
+        v.z += 5;
+        v.x += -5;
+        initAnimation(v);
+        
+        strategy = new ConcreteBlue();
+        v.z -= 20;
+        v.x -= -20;
+        initGumballs(v);
+        
         //flyCam.setEnabled(true);
         ChaseCamera chaseCam = new ChaseCamera(cam, car, inputManager);
         chaseCam.setSmoothMotion(true);
         //kandarp
     }
     
-    public void initAnimation(float x, float y, float z) {
+    
+    
+    public void initAnimation(Vector3f v) {
         Node player = (Node) assetManager.loadModel("Models/Oto/Oto.mesh.xml");
-        player.setLocalScale(3f);
-        player.setLocalTranslation(x, y, z);
+        player.setLocalScale(1f);
+        player.setLocalTranslation(v);
         player.addControl(new RigidBodyControl(0));
 
         rootNode.attachChild(player);
@@ -255,8 +221,8 @@ public class GamePlayAppState extends AbstractAppState {
         getPhysicsSpace().add(wall);
     }
 
-    public void initSphere(float x, float y, float z) {
-        Sphere sphereMesh = new Sphere(32, 32, 20f);
+    public void initSphere(Vector3f v) {
+        Sphere sphereMesh = new Sphere(3, 3, 3f);
         Geometry sphereGeo = new Geometry("Shiny rock", sphereMesh);
         sphereMesh.setTextureMode(Sphere.TextureMode.Projected); // better quality on spheres
         TangentBinormalGenerator.generate(sphereMesh);           // for lighting effect
@@ -271,7 +237,7 @@ public class GamePlayAppState extends AbstractAppState {
         sphereMat.setColor("Specular", ColorRGBA.Yellow);
         sphereMat.setFloat("Shininess", 64f);  // [0,128]
         sphereGeo.setMaterial(sphereMat);
-        sphereGeo.setLocalTranslation(x, y, z); // Move it a bit
+        sphereGeo.setLocalTranslation(v); // Move it a bit
         sphereGeo.rotate(1.6f, 0, 0);          // Rotate it a bit
         sphereGeo.addControl(new RigidBodyControl(0));
         rootNode.attachChild(sphereGeo);
