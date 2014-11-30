@@ -18,7 +18,7 @@ import StrategyColor.ConcreteRed;
 import StrategyColor.ConcreteBlue;
 import StrategyColor.ConcretePink;
 import StrategyColor.StrategyColorInterface;
-import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.BulletAppState; 
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.control.VehicleControl;
@@ -48,12 +48,15 @@ import com.jme3.texture.Texture2D;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.water.WaterFilter;
 import observer.CarControlActionListener;
+import com.jme3.bullet.collision.PhysicsCollisionEvent;
+import com.jme3.bullet.collision.PhysicsCollisionListener;
+import java.util.HashSet;
 
 /**
  *
  * @author Tanveer
  */
-public class GamePlayAppState extends AbstractAppState {
+public class GamePlayAppState extends AbstractAppState implements PhysicsCollisionListener{
     private AssetManager assetManager;
     private InputManager inputManager;
     private ViewPort guiViewPort;
@@ -76,7 +79,11 @@ public class GamePlayAppState extends AbstractAppState {
     // kandarp
     StrategyColorInterface strategy;
     private StartScreenAppState startScreenAppState;
-    private static int gameScore;
+    private int gameScore = 0;
+    int iGumballId = 0;
+    int iCountGumballCollision = 0;
+    Vector3f vctr;
+    static HashSet<String> seenGumballs = new HashSet<String>();
 
     // kandarp
     private static GamePlayAppState instance = new GamePlayAppState();
@@ -117,6 +124,7 @@ public class GamePlayAppState extends AbstractAppState {
     public void update(float tpf) {
         //TODO: implement behavior during runtime
         cam.lookAt(vehicle.getPhysicsLocation(), Vector3f.UNIT_Y);
+        
         startScreenAppState.updateScore(gameScore);
     }
 
@@ -131,11 +139,14 @@ public class GamePlayAppState extends AbstractAppState {
     /*Custom methods*/
     public void scoreApi() {
         gameScore++;
+        dispenseGumballs(vctr, gameScore, app);
+        vctr.x += 5;
+        
     }
     public void setUpGame(SimpleApplication app) {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-
+        bulletAppState.getPhysicsSpace().addCollisionListener(this);
         initTerrain();
         initPPcWater();
 
@@ -143,10 +154,19 @@ public class GamePlayAppState extends AbstractAppState {
         setupKeys();
         buildPlayer();
         Vector3f v = vehicle.getPhysicsLocation();
-
+        
         
         v.z += 10;
         initSphere(v);
+        
+        v.x += 10;
+        vctr = v;
+        gumballMachine(v);
+        
+        strategy = new ConcreteBlue();
+        v.z += 20;
+        v.x += 10;
+        initGumballs(v);
         
         strategy = new ConcretePink();
         v.z += 20;
@@ -180,6 +200,9 @@ public class GamePlayAppState extends AbstractAppState {
         v.z -= 20;
         v.x -= -20;
         initGumballs(v);
+        
+        
+       
         
         //flyCam.setEnabled(true);
         ChaseCamera chaseCam = new ChaseCamera(cam, car, inputManager);
@@ -253,7 +276,8 @@ public class GamePlayAppState extends AbstractAppState {
         mats1.setColor("Color", strategy.getColor());
         geoms.setMaterial(mats1);
         geoms.setLocalTranslation(v);
-
+        iGumballId ++;
+        geoms.setName("gumball"+iGumballId);
         geoms.addControl(new RigidBodyControl(0));
         rootNode.attachChild(geoms);
         getPhysicsSpace().add(geoms);
@@ -292,7 +316,7 @@ public class GamePlayAppState extends AbstractAppState {
         vehicle.setGravity(new Vector3f(30, 30, 30));
 
         car.addControl(vehicle);
-
+        car.setName("car");
         rootNode.attachChild(car);
         bulletAppState.getPhysicsSpace().add(car);
     }
@@ -413,5 +437,80 @@ public class GamePlayAppState extends AbstractAppState {
         fpp.addFilter(water);
         this.app.getViewPort().addProcessor(fpp);
     }
+    
+    @Override
+    public void collision(PhysicsCollisionEvent event) 
+    {
+       String nameA = event.getNodeA().getName();
+       String nameB = event.getNodeB().getName();
+        
+        if(nameA.equals("car") && nameB.startsWith("gumball") && !seenGumballs.contains(nameB)) 
+        {
+            seenGumballs.add(nameB);
+            scoreApi();
+            rootNode.detachChild(event.getNodeB());
+            bulletAppState.getPhysicsSpace().remove(event.getNodeB());
+        }
+        if(nameA.equals("car") && nameB.startsWith("wall")) 
+        {
+            System.out.println("Call Tanveer's API to exit the game !!");
+        }
+        
+    }
     //kandarp
+    
+    public void gumballMachine(Vector3f v)
+    {
+        Vector3f crank_box=new Vector3f(v.x,v.y,v.z);
+        Vector3f headsphere=new Vector3f(v.x,(v.y+2f),v.z);
+        Vector3f footer_box=new Vector3f(v.x,(v.y-1.7f),v.z);
+
+        Box b_crankbox = new Box(1, 1.5f, 1);
+        Sphere s_headsphere=new Sphere(3,3,1.7f);
+        Box b_footer=new Box(1.3f,0.3f,1.3f);
+        
+        Geometry geom_crankbox = new Geometry("Box", b_crankbox);
+        Geometry geom_headsphere=new Geometry("Sphere", s_headsphere);
+        Geometry geom_footer=new Geometry("Box",b_footer);
+        
+        Material mat_crankbox = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat_crankbox.setColor("Color", ColorRGBA.Red);
+        geom_crankbox.setMaterial(mat_crankbox);
+        geom_crankbox.setLocalTranslation(crank_box);
+
+        Material mat_headsphere = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat_headsphere.setColor("Color", ColorRGBA.White);
+        geom_headsphere.setMaterial(mat_headsphere);
+        geom_headsphere.setLocalTranslation(headsphere);
+
+        Material mat_footer = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat_footer.setColor("Color", ColorRGBA.Yellow);
+        geom_footer.setMaterial(mat_footer);
+        geom_footer.setLocalTranslation(footer_box);
+        
+        rootNode.attachChild(geom_crankbox);
+        rootNode.attachChild(geom_headsphere);
+        rootNode.attachChild(geom_footer);
+        
+    }
+    
+    public void dispenseGumballs(Vector3f v, int i, SimpleApplication app)
+    {
+        int j;
+        for(j=0;j<i;j++)
+        {
+        Vector3f gumball=new Vector3f(j+2,1,0);
+        Sphere s_gumball=new Sphere(30,30,0.4f);
+        Geometry geom_gumball=new Geometry("Sphere", s_gumball);
+
+        
+        Material mat_gumball = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat_gumball.setColor("Color", ColorRGBA.randomColor());
+        geom_gumball.setMaterial(mat_gumball);
+        geom_gumball.setLocalTranslation(gumball);
+        
+        
+        rootNode.attachChild(geom_gumball);
+        }
+    }
 }
